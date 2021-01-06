@@ -49,7 +49,5 @@ def lambda_handler(event, context):
     # Return the status code 200.
     return {
         "statusCode": 200,
-        "body": json.dumps({
-            "presignedUrl": presigned_url
-        })
+        "body": json.dumps(presigned_url)
     }
