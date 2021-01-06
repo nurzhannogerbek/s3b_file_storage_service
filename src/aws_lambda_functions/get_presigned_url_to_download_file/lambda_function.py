@@ -25,7 +25,7 @@ def lambda_handler(event, context):
 
     # Define all necessary parameters to generate the presigned URL.
     try:
-        key_name = query_string_parameters["key_name"]
+        key = query_string_parameters["key"]
     except Exception as error:
         logger.error(error)
         raise Exception(error)
@@ -39,7 +39,7 @@ def lambda_handler(event, context):
             "get_object",
             Params={
                 "Bucket": BUCKET_NAME,
-                "Key": key_name
+                "Key": key
             },
             ExpiresIn=3600
         )

@@ -25,7 +25,7 @@ def lambda_handler(event, context):
 
     # Define all necessary parameters to generate the presigned URL.
     try:
-        key_name = query_string_parameters["key_name"]
+        key = query_string_parameters["key"]
     except Exception as error:
         logger.error(error)
         raise Exception(error)
@@ -37,7 +37,7 @@ def lambda_handler(event, context):
     try:
         presigned_url = s3_client.generate_presigned_post(
             Bucket=BUCKET_NAME,
-            Key=key_name,
+            Key=key,
             Fields=None,
             Conditions=None,
             ExpiresIn=3600
