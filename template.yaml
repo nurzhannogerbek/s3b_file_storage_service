@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Parameters:
+  StageName:
+    Type: String
+  EnvironmentName:
+    Type: String
+  BucketName:
+    Type: String
+Globals:
+  Function:
+    Runtime: python3.8
+    MemorySize: 10240
+    Timeout: 900
+    Environment:
+      Variables:
+        BUCKET_NAME:
+          'Fn::Sub': '${BucketName}'
+Resources:
+  FileStorageApiGateway:
+    Type: 'AWS::Serverless::HttpApi'
+    Properties:
+      StageName:
+        'Fn::Sub': '${StageName}'
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+        AllowHeaders:
+          - '*'
+        AllowOrigins:
+          - '*'
+  GetPresignedUrlToDownloadFile:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName:
+        'Fn::Sub': '${EnvironmentName}GetPresignedUrlToDownloadFile'
+      CodeUri: src/aws_lambda_functions/get_presigned_url_to_download_file
+      Handler: lambda_function.lambda_handler
+      Events:
+        FileStorageApiGateway:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: FileStorageApiGateway
+            Path: '/get_presigned_url_to_download_file'
+            Method: GET
+  GetPresignedUrlToUploadFile:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName:
+        'Fn::Sub': '${EnvironmentName}GetPresignedUrlToUploadFile'
+      CodeUri: src/aws_lambda_functions/get_presigned_url_to_upload_file
+      Handler: lambda_function.lambda_handler
+      Events:
+        FileStorageApiGateway:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: FileStorageApiGateway
+            Path: '/get_presigned_url_to_upload_file'
+            Method: GET

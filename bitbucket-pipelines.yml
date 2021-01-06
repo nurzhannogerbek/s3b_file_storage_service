@@ -1,0 +1,55 @@
+image:
+  name: 'python:3.8'
+deploy:
+  - step: &deploy
+      script:
+        - |
+          if [ $BITBUCKET_BRANCH == 'develop' ]; then
+            export S3_BUCKET='dev-3beep-file-storage-service'
+            export STACK_NAME='Dev3beepFileStorageService'
+            export STAGE_NAME='dev'
+            export ENVIRONMENT_NAME='Dev'
+          fi
+        - |
+          if [ $BITBUCKET_BRANCH == 'master' ]; then
+            export S3_BUCKET='prod-3beep-file-storage-service'
+            export STACK_NAME='Prod3beepFileStorageService'
+            export STAGE_NAME='prod'
+            export ENVIRONMENT_NAME='Prod'
+          fi
+        - pipe: 'atlassian/aws-sam-deploy:0.5.2'
+          variables:
+            AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+            AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+            S3_BUCKET: $S3_BUCKET
+            STACK_NAME: $STACK_NAME
+            CAPABILITIES:
+              - CAPABILITY_IAM
+              - CAPABILITY_NAMED_IAM
+              - CAPABILITY_AUTO_EXPAND
+            SAM_TEMPLATE: template.yaml
+            STACK_PARAMETERS: |
+              [
+                {
+                  'ParameterKey': 'BucketName',
+                  'ParameterValue': '${S3_BUCKET}'
+                },
+                {
+                  'ParameterKey': 'StageName',
+                  'ParameterValue': '${STAGE_NAME}'
+                },
+                {
+                  'ParameterKey': 'EnvironmentName',
+                  'ParameterValue': '${ENVIRONMENT_NAME}'
+                }
+              ]
+            WAIT: 'true'
+            WAIT_INTERVAL: 60
+            DEBUG: 'true'
+pipelines:
+  branches:
+    develop:
+      - step: *deploy
+    master:
+      - step: *deploy
