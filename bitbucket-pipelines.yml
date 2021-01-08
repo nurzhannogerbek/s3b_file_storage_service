@@ -24,7 +24,7 @@ deploy:
             AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
             S3_BUCKET: $S3_BUCKET
             LOCAL_PATH: '$(pwd)'
-            EXTRA_ARGS: '--exclude=chat_rooms  --exclude=users'
+            EXTRA_ARGS: '--exclude=*'
             DELETE_FLAG: 'true'
             DEBUG: 'true'
         - pipe: 'atlassian/aws-sam-deploy:0.5.2'
