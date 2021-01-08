@@ -22,12 +22,13 @@ deploy:
         - aws configure set default.region $AWS_DEFAULT_REGION
         - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
         - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-        - aws s3 rm s3://$S3_BUCKET/ --recursive --exclude "$S3_BUCKET/chat_rooms" --exclude "$S3_BUCKET/users"
+        - aws s3 rm s3://$S3_BUCKET/ --recursive --exclude "chat_rooms" --exclude "users"
         - pipe: 'atlassian/aws-sam-deploy:0.5.2'
           variables:
             AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
             AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
             AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+            S3_BUCKET: $S3_BUCKET
             STACK_NAME: $STACK_NAME
             SAM_TEMPLATE: template.yaml
             CAPABILITIES:
