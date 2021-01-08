@@ -40,15 +40,15 @@ deploy:
                   'ParameterValue': '${ENVIRONMENT_NAME}'
                 },
                 {
-                  'ParameterKey': 'AwsAccessKeyId',
+                  'ParameterKey': 'S3AccessKeyId',
                   'ParameterValue': '${AWS_ACCESS_KEY_ID}'
                 },
                 {
-                  'ParameterKey': 'AwsSecretAccessKey',
+                  'ParameterKey': 'S3SecretAccessKey',
                   'ParameterValue': '${AWS_SECRET_ACCESS_KEY}'
                 },
                 {
-                  'ParameterKey': 'BucketName',
+                  'ParameterKey': 'S3Bucket',
                   'ParameterValue': '${S3_BUCKET}'
                 }
               ]

@@ -8,9 +8,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
 # Initialize constants with parameters to configure.
-AWS_ACCESS_KEY_ID = os.environ["AWS_ACCESS_KEY_ID"]
-AWS_SECRET_ACCESS_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
-BUCKET_NAME = os.environ["BUCKET_NAME"]
+S3_ACCESS_KEY_ID = os.environ["S3_ACCESS_KEY_ID"]
+S3_SECRET_ACCESS_KEY = os.environ["S3_SECRET_ACCESS_KEY"]
+S3_BUCKET = os.environ["S3_BUCKET"]
 
 
 def lambda_handler(event, context):
@@ -27,21 +27,21 @@ def lambda_handler(event, context):
 
     # Define all necessary parameters to generate the presigned URL.
     try:
-        key = query_string_parameters["key"]
+        s3_key = query_string_parameters["s3_key"]
     except Exception as error:
         logger.error(error)
         raise Exception(error)
 
     # Create a low-level service client by name using the default session.
-    s3_client = boto3.client("s3", aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+    s3_client = boto3.client("s3", aws_access_key_id=S3_ACCESS_KEY_ID, aws_secret_access_key=S3_SECRET_ACCESS_KEY)
 
     # Generate the presigned URL for the S3 object.
     try:
         presigned_url = s3_client.generate_presigned_url(
             "get_object",
             Params={
-                "Bucket": BUCKET_NAME,
-                "Key": key
+                "Bucket": S3_BUCKET,
+                "Key": s3_key
             },
             ExpiresIn=3600
         )

@@ -5,11 +5,11 @@ Parameters:
     Type: String
   EnvironmentName:
     Type: String
-  AwsAccessKeyId:
+  S3AccessKeyId:
     Type: String
-  AwsSecretAccessKey:
+  S3SecretAccessKey:
     Type: String
-  BucketName:
+  S3Bucket:
     Type: String
 Globals:
   Function:
@@ -18,12 +18,12 @@ Globals:
     Timeout: 900
     Environment:
       Variables:
-        AWS_ACCESS_KEY_ID:
-          'Fn::Sub': '${AwsAccessKeyId}'
-        AWS_SECRET_ACCESS_KEY:
-          'Fn::Sub': '${AwsSecretAccessKey}'
-        BUCKET_NAME:
-          'Fn::Sub': '${BucketName}'
+        S3_ACCESS_KEY_ID:
+          'Fn::Sub': '${S3AccessKeyId}'
+        S3_SECRET_ACCESS_KEY:
+          'Fn::Sub': '${S3SecretAccessKey}'
+        S3_BUCKET:
+          'Fn::Sub': '${S3Bucket}'
 Resources:
   FileStorageApiGateway:
     Type: 'AWS::Serverless::HttpApi'
