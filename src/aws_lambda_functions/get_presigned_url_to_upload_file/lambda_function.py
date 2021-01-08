@@ -37,12 +37,11 @@ def lambda_handler(event, context):
 
     # Generate the presigned URL for the S3 object.
     try:
-        presigned_url = s3_client.generate_presigned_url(
-            "put_object",
-            Params={
-                "Bucket": S3_BUCKET,
-                "Key": s3_key
-            },
+        presigned_url = s3_client.generate_presigned_post(
+            Bucket=S3_BUCKET,
+            Key=s3_key,
+            Fields=None,
+            Conditions=None,
             ExpiresIn=3600
         )
     except Exception as error:
@@ -53,7 +52,7 @@ def lambda_handler(event, context):
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "presignedUrl": presigned_url,
-            "publicUrl": "https://{0}.s3.amazonaws.com/{1}".format(S3_BUCKET, s3_key)
+            "data": presigned_url,
+            "url": "https://{0}.s3.amazonaws.com/{1}".format(S3_BUCKET, s3_key)
         })
     }

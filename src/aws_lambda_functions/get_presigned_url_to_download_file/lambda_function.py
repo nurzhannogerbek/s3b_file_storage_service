@@ -53,7 +53,7 @@ def lambda_handler(event, context):
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "presignedUrl": presigned_url,
-            "publicUrl": "https://{0}.s3.amazonaws.com/{1}".format(S3_BUCKET, s3_key)
+            "data": presigned_url,
+            "url": "https://{0}.s3.amazonaws.com/{1}".format(S3_BUCKET, s3_key)
         })
     }
