@@ -65,6 +65,7 @@ deploy:
             WAIT: 'true'
             WAIT_INTERVAL: 60
             DEBUG: 'true'
+            COMMAND: 'deploy-only'
 pipelines:
   branches:
     develop:
