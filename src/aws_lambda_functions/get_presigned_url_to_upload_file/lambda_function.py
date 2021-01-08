@@ -12,6 +12,9 @@ S3_ACCESS_KEY_ID = os.environ["S3_ACCESS_KEY_ID"]
 S3_SECRET_ACCESS_KEY = os.environ["S3_SECRET_ACCESS_KEY"]
 S3_BUCKET = os.environ["S3_BUCKET"]
 
+# Create a low-level service client by name using the default session.
+s3_client = boto3.client("s3", aws_access_key_id=S3_ACCESS_KEY_ID, aws_secret_access_key=S3_SECRET_ACCESS_KEY)
+
 
 def lambda_handler(event, context):
     """
@@ -32,9 +35,6 @@ def lambda_handler(event, context):
         logger.error(error)
         raise Exception(error)
 
-    # Create a low-level service client by name using the default session.
-    s3_client = boto3.client("s3", aws_access_key_id=S3_ACCESS_KEY_ID, aws_secret_access_key=S3_SECRET_ACCESS_KEY)
-
     # Generate the presigned URL for the S3 object.
     try:
         presigned_url = s3_client.generate_presigned_url(
@@ -52,5 +52,8 @@ def lambda_handler(event, context):
     # Return the status code 200.
     return {
         "statusCode": 200,
-        "body": json.dumps({"presignedUrl": presigned_url})
+        "body": json.dumps({
+            "presignedUrl": presigned_url,
+            "publicUrl": "https://{0}.s3.amazonaws.com/{1}".format(S3_BUCKET, s3_key)
+        })
     }
