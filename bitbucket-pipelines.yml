@@ -32,16 +32,24 @@ deploy:
             STACK_PARAMETERS: |
               [
                 {
-                  'ParameterKey': 'BucketName',
-                  'ParameterValue': '${S3_BUCKET}'
-                },
-                {
                   'ParameterKey': 'StageName',
                   'ParameterValue': '${STAGE_NAME}'
                 },
                 {
                   'ParameterKey': 'EnvironmentName',
                   'ParameterValue': '${ENVIRONMENT_NAME}'
+                },
+                {
+                  'ParameterKey': 'AwsAccessKeyId',
+                  'ParameterValue': '${AWS_ACCESS_KEY_ID}'
+                },
+                {
+                  'ParameterKey': 'AwsSecretAccessKey',
+                  'ParameterValue': '${AWS_SECRET_ACCESS_KEY}'
+                },
+                {
+                  'ParameterKey': 'BucketName',
+                  'ParameterValue': '${S3_BUCKET}'
                 }
               ]
             WAIT: 'true'

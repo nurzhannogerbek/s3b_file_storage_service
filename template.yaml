@@ -5,6 +5,10 @@ Parameters:
     Type: String
   EnvironmentName:
     Type: String
+  AwsAccessKeyId:
+    Type: String
+  AwsSecretAccessKey:
+    Type: String
   BucketName:
     Type: String
 Globals:
@@ -14,6 +18,10 @@ Globals:
     Timeout: 900
     Environment:
       Variables:
+        AWS_ACCESS_KEY_ID:
+          'Fn::Sub': '${AwsAccessKeyId}'
+        AWS_SECRET_ACCESS_KEY:
+          'Fn::Sub': '${AwsSecretAccessKey}'
         BUCKET_NAME:
           'Fn::Sub': '${BucketName}'
 Resources:
