@@ -106,17 +106,17 @@ Resources:
       CodeUri: src/aws_lambda_functions/automatically_resize_and_crop_image
       Handler: lambda_function.lambda_handler
       Events:
-        ChatRoomsJPG:
-          Type: S3
-          Properties:
-            Bucket: !Ref FileStorage
-            Events: s3:ObjectCreated:*
-            Filter:
-              S3Key:
-                Rule:
-                  - Name: prefix
-                    Value: 'chat_rooms/'
-                  - Name: suffix
-                    Value: '.jpg'
+        - ChatRoomsJPG:
+            Type: S3
+            Properties:
+              Bucket: !Ref FileStorage
+              Events: s3:ObjectCreated:*
+              Filter:
+                S3Key:
+                  Rule:
+                    - Name: prefix
+                      Value: 'chat_rooms/'
+                    - Name: suffix
+                      Value: '.jpg'
       Layers:
         - 'Fn::Sub': '${PillowLayerARN}'
