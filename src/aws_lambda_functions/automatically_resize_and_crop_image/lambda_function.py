@@ -22,5 +22,7 @@ def lambda_handler(event, context):
     :param event: The AWS Lambda function uses this parameter to pass in event data to the handler.
     :param context: The AWS Lambda function uses this parameter to provide runtime information to your handler.
     """
+    # https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html
+
     # Return nothing.
     return None
