@@ -6,6 +6,7 @@ deploy:
         - |
           if [ $BITBUCKET_BRANCH == 'develop' ]; then
             export S3_BUCKET='dev-3beep-file-storage-service'
+            export FILE_STORAGE_NAME='dev-3beep-file-storage'
             export STACK_NAME='Dev3beepFileStorageService'
             export STAGE_NAME='dev'
             export ENVIRONMENT_NAME='Dev'
@@ -14,6 +15,7 @@ deploy:
         - |
           if [ $BITBUCKET_BRANCH == 'master' ]; then
             export S3_BUCKET='prod-3beep-file-storage-service'
+            export FILE_STORAGE_NAME='prod-3beep-file-storage'
             export STACK_NAME='Prod3beepFileStorageService'
             export STAGE_NAME='prod'
             export ENVIRONMENT_NAME='Prod'
@@ -65,7 +67,7 @@ deploy:
                 },
                 {
                   'ParameterKey': 'S3Bucket',
-                  'ParameterValue': '${S3_BUCKET}'
+                  'ParameterValue': '${FILE_STORAGE_NAME}'
                 },
                 {
                   'ParameterKey': 'PillowLayerARN',
