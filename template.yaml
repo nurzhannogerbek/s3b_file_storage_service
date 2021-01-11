@@ -91,7 +91,7 @@ Resources:
             Method: POST
       Layers:
         - 'Fn::Sub': '${PillowLayerARN}'
-  S3Bucket:
+  FileStorage:
     Type: AWS::S3::Bucket
     Properties:
       BucketName:
@@ -109,7 +109,7 @@ Resources:
         AutomaticallyResizeAndCropImageEvent:
           Type: S3
           Properties:
-            Bucket: !Ref S3Bucket
+            Bucket: !Ref FileStorage
             Events: s3:ObjectCreated:*
             Filter:
               AutomaticallyResizeAndCropImageFilter:
