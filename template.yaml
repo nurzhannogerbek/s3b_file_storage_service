@@ -91,20 +91,25 @@ Resources:
             Method: POST
       Layers:
         - 'Fn::Sub': '${PillowLayerARN}'
-  S3FileStorage:
+  S3Bucket:
     Type: AWS::S3::Bucket
+      Properties:
+        BucketName:
+          'Fn::Sub': '${S3Bucket}'
   AutomaticallyResizeAndCropImage:
     Type: 'AWS::Serverless::Function'
     Properties:
       FunctionName:
         'Fn::Sub': '${EnvironmentName}AutomaticallyResizeAndCropImage'
+      Policies:
+        - AmazonS3FullAccess
       CodeUri: src/aws_lambda_functions/automatically_resize_and_crop_image
       Handler: lambda_function.lambda_handler
       Events:
         AutomaticallyResizeAndCropImageEvent:
           Type: S3
           Properties:
-            Bucket: !Ref SrcBucket
+            Bucket: !Ref S3Bucket
             Events: s3:ObjectCreated:*
             Filter:
               AutomaticallyResizeAndCropImageFilter:
