@@ -113,10 +113,34 @@ Resources:
               Events: s3:ObjectCreated:*
               Filter:
                 S3Key:
-                  Rule:
+                  Rules:
                     - Name: prefix
                       Value: 'chat_rooms/'
                     - Name: suffix
                       Value: '.jpg'
+        - ChatRoomsJPEG:
+           Type: S3
+           Properties:
+            Bucket: !Ref FileStorage
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rule:
+                  - Name: prefix
+                    Value: 'chat_rooms/'
+                  - Name: suffix
+                    Value: '.jpeg'
+        - ChatRoomsPNG:
+            Type: S3
+            Properties:
+              Bucket: !Ref FileStorage
+              Events: s3:ObjectCreated:*
+              Filter:
+                S3Key:
+                  Rule:
+                    - Name: prefix
+                      Value: 'chat_rooms/'
+                    - Name: suffix
+                      Value: '.png'
       Layers:
         - 'Fn::Sub': '${PillowLayerARN}'
