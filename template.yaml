@@ -125,7 +125,7 @@ Resources:
             Events: s3:ObjectCreated:*
             Filter:
               S3Key:
-                Rule:
+                Rules:
                   - Name: prefix
                     Value: 'chat_rooms/'
                   - Name: suffix
@@ -137,7 +137,7 @@ Resources:
               Events: s3:ObjectCreated:*
               Filter:
                 S3Key:
-                  Rule:
+                  Rules:
                     - Name: prefix
                       Value: 'chat_rooms/'
                     - Name: suffix
