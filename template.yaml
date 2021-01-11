@@ -11,7 +11,7 @@ Parameters:
     Type: String
   S3DefaultRegion:
     Type: String
-  S3Bucket:
+  FileStorageName:
     Type: String
   PillowLayerARN:
     Type: String
@@ -28,8 +28,8 @@ Globals:
           'Fn::Sub': '${S3SecretAccessKey}'
         S3_DEFAULT_REGION:
           'Fn::Sub': '${S3DefaultRegion}'
-        S3_BUCKET:
-          'Fn::Sub': '${S3Bucket}'
+        FILE_STORAGE_NAME:
+          'Fn::Sub': '${FileStorageName}'
 Resources:
   FileStorageApiGateway:
     Type: 'AWS::Serverless::HttpApi'
@@ -95,7 +95,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName:
-        'Fn::Sub': '${S3Bucket}'
+        'Fn::Sub': '${FileStorageName}'
   AutomaticallyResizeAndCropImage:
     Type: 'AWS::Serverless::Function'
     Properties:
@@ -106,20 +106,40 @@ Resources:
       CodeUri: src/aws_lambda_functions/automatically_resize_and_crop_image
       Handler: lambda_function.lambda_handler
       Events:
-        S3Event:
+        ChatRoomsJPG:
           Type: S3
           Properties:
             Bucket: !Ref FileStorage
             Events: s3:ObjectCreated:*
             Filter:
               S3Key:
-                Rules:
+                Rule:
                   - Name: prefix
                     Value: 'chat_rooms/'
                   - Name: suffix
                     Value: '.jpg'
+        ChatRoomsJPEG:
+          Type: S3
+          Properties:
+            Bucket: !Ref FileStorage
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rule:
+                  - Name: prefix
+                    Value: 'chat_rooms/'
                   - Name: suffix
                     Value: '.jpeg'
+        ChatRoomsPNG:
+          Type: S3
+          Properties:
+            Bucket: !Ref FileStorage
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rule:
+                  - Name: prefix
+                    Value: 'chat_rooms/'
                   - Name: suffix
                     Value: '.png'
       Layers:

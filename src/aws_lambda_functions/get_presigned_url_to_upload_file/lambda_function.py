@@ -12,7 +12,7 @@ logger.setLevel(logging.ERROR)
 S3_ACCESS_KEY_ID = os.environ["S3_ACCESS_KEY_ID"]
 S3_SECRET_ACCESS_KEY = os.environ["S3_SECRET_ACCESS_KEY"]
 S3_DEFAULT_REGION = os.environ["S3_DEFAULT_REGION"]
-S3_BUCKET = os.environ["S3_BUCKET"]
+FILE_STORAGE_NAME = os.environ["FILE_STORAGE_NAME"]
 
 # Create a low-level service client by name using the default session.
 s3_client = boto3.client("s3", aws_access_key_id=S3_ACCESS_KEY_ID, aws_secret_access_key=S3_SECRET_ACCESS_KEY)
@@ -33,7 +33,7 @@ def lambda_handler(event, context):
     # Generate the presigned URL for the S3 object.
     try:
         presigned_url = s3_client.generate_presigned_post(
-            Bucket=S3_BUCKET,
+            Bucket=FILE_STORAGE_NAME,
             Key=s3_key,
             Fields=None,
             Conditions=None,
@@ -48,6 +48,6 @@ def lambda_handler(event, context):
         "statusCode": 200,
         "body": json.dumps({
             "data": presigned_url,
-            "url": "https://{0}.s3.{1}.amazonaws.com/{2}".format(S3_BUCKET, S3_DEFAULT_REGION, s3_key)
+            "url": "https://{0}.s3.{1}.amazonaws.com/{2}".format(FILE_STORAGE_NAME, S3_DEFAULT_REGION, s3_key)
         })
     }
