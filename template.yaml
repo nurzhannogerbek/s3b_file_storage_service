@@ -111,10 +111,10 @@ Resources:
                   - Name: prefix
                     Value: 'chat_rooms/'
                   - Name: suffix
-                      Value: '.jpg'
+                    Value: '.jpg'
                   - Name: suffix
-                      Value: '.jpeg'
+                    Value: '.jpeg'
                   - Name: suffix
-                      Value: '.png'
+                    Value: '.png'
       Layers:
         - 'Fn::Sub': '${PillowLayerARN}'
