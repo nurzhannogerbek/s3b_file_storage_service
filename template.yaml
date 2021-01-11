@@ -112,7 +112,7 @@ Resources:
             Bucket: !Ref FileStorage
             Events: s3:ObjectCreated:*
             Filter:
-              AutomaticallyResizeAndCropImageFilter:
+              S3Key:
                 Rules:
                   - Name: prefix
                     Value: 'chat_rooms/'
