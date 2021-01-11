@@ -93,9 +93,9 @@ Resources:
         - 'Fn::Sub': '${PillowLayerARN}'
   S3Bucket:
     Type: AWS::S3::Bucket
-      Properties:
-        BucketName:
-          'Fn::Sub': '${S3Bucket}'
+    Properties:
+      BucketName:
+        'Fn::Sub': '${S3Bucket}'
   AutomaticallyResizeAndCropImage:
     Type: 'AWS::Serverless::Function'
     Properties:
