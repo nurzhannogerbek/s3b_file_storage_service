@@ -61,7 +61,7 @@ deploy:
                 },
                 {
                   'ParameterKey': 'S3DefaultRegion',
-                  'ParameterValue': '${$AWS_DEFAULT_REGION}'
+                  'ParameterValue': '${AWS_DEFAULT_REGION}'
                 },
                 {
                   'ParameterKey': 'S3Bucket',
