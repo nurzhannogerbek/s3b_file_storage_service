@@ -9,7 +9,11 @@ Parameters:
     Type: String
   S3SecretAccessKey:
     Type: String
+  S3DefaultRegion:
+    Type: String
   S3Bucket:
+    Type: String
+  PillowLayerARN:
     Type: String
 Globals:
   Function:
@@ -22,6 +26,8 @@ Globals:
           'Fn::Sub': '${S3AccessKeyId}'
         S3_SECRET_ACCESS_KEY:
           'Fn::Sub': '${S3SecretAccessKey}'
+        S3_DEFAULT_REGION:
+          'Fn::Sub': '${S3DefaultRegion}'
         S3_BUCKET:
           'Fn::Sub': '${S3Bucket}'
 Resources:
@@ -33,6 +39,7 @@ Resources:
       CorsConfiguration:
         AllowMethods:
           - GET
+          - POST
         AllowHeaders:
           - '*'
         AllowOrigins:
@@ -67,3 +74,47 @@ Resources:
               Ref: FileStorageApiGateway
             Path: '/get_presigned_url_to_upload_file'
             Method: GET
+  ResizeAndCropImage:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName:
+        'Fn::Sub': '${EnvironmentName}ResizeAndCropImage'
+      CodeUri: src/aws_lambda_functions/resize_and_crop_image
+      Handler: lambda_function.lambda_handler
+      Events:
+        FileStorageApiGateway:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: FileStorageApiGateway
+            Path: '/resize_and_crop_image'
+            Method: POST
+      Layers:
+        - 'Fn::Sub': '${PillowLayerARN}'
+  AutomaticallyResizeAndCropImage:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName:
+        'Fn::Sub': '${EnvironmentName}AutomaticallyResizeAndCropImage'
+      CodeUri: src/aws_lambda_functions/automatically_resize_and_crop_image
+      Handler: lambda_function.lambda_handler
+      Events:
+        AutomaticallyResizeAndCropImageEvent:
+          Type: S3
+          Properties:
+            Bucket:
+              'Fn::Sub': '${S3Bucket}'
+            Events: s3:ObjectCreated:*
+            Filter:
+              AutomaticallyResizeAndCropImageFilter:
+                Rules:
+                  - Name: prefix
+                    Value: 'chat_rooms/'
+                  - Name: suffix
+                      Value: '.jpg'
+                  - Name: suffix
+                      Value: '.jpeg'
+                  - Name: suffix
+                      Value: '.png'
+      Layers:
+        - 'Fn::Sub': '${PillowLayerARN}'
