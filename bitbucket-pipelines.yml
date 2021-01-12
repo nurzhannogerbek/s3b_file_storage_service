@@ -31,10 +31,7 @@ deploy:
           export OPENCV_LAYER_ARN=$(aws lambda list-layer-versions
           --layer-name $OPENCV_LAYER_NAME --query 'max_by(LayerVersions,
           &Version).LayerVersionArn' --output text)
-        - >-
-          export SCIPY_LAYER_ARN=$(aws lambda list-layer-versions
-          --layer-name AWSLambda-Python38-SciPy1x --query 'max_by(LayerVersions,
-          &Version).LayerVersionArn' --output text)
+        - export SCIPY_LAYER_ARN='arn:aws:lambda:eu-central-1:292169987271:layer:AWSLambda-Python38-SciPy1x:29'
         - pipe: 'atlassian/aws-sam-deploy:0.5.2'
           variables:
             AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
