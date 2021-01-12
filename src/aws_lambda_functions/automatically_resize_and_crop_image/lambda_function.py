@@ -1,8 +1,6 @@
 import logging
 import os
 import boto3
-from PIL import Image
-from io import BytesIO
 
 # Configure the logging tool in the AWS Lambda function.
 logger = logging.getLogger(__name__)
@@ -40,33 +38,7 @@ def lambda_handler(event, context):
             logger.error(error)
             raise Exception(error)
 
-        # Grab the original source file.
-        try:
-            original_s3_object = s3_client.Object(bucket_name=FILE_STORAGE_NAME, key=original_s3_object_key)
-        except Exception as error:
-            logger.error(error)
-            raise Exception(error)
-        original_s3_object_body = original_s3_object.get()["Body"].read()
-
-        # Create the image object.
-        original_image = Image.open(BytesIO(original_s3_object_body))
-
-        # The file format of the source file.
-        buffer_format = original_image.format
-
-        # Resize and crop the image file.
-        new_image = original_image.resize((sizes[3]["width"], sizes[3]["height"]), Image.ANTIALIAS)
-        buffer = BytesIO()
-        new_image.save(buffer, buffer_format)
-        buffer.seek(0)
-
-        # Define the new S3 object key.
-        split_path = os.path.splitext(original_s3_object_key)
-        new_s3_object_key = "{0}_{1}{2}".format(split_path[0], "40x40", split_path[1])
-
-        # Upload the new image.
-        new_s3_object = s3_client.Object(bucket_name=FILE_STORAGE_NAME, key=new_s3_object_key)
-        new_s3_object.put(Body=buffer)
+        print(original_s3_object_key)
 
     # Return nothing.
     return None

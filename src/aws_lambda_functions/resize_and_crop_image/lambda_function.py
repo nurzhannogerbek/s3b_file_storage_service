@@ -1,9 +1,6 @@
 import logging
 import os
 import boto3
-from PIL import Image
-from io import BytesIO
-import json
 
 # Configure the logging tool in the AWS Lambda function.
 logger = logging.getLogger(__name__)
