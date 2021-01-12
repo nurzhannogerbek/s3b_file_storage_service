@@ -15,6 +15,8 @@ Parameters:
     Type: String
   OpenCVLayerARN:
     Type: String
+  SciPyLayerARN:
+    Type: String
 Globals:
   Function:
     Runtime: python3.8
@@ -91,6 +93,7 @@ Resources:
             Method: POST
       Layers:
         - 'Fn::Sub': '${OpenCVLayerARN}'
+        - 'Fn::Sub': '${SciPyLayerARN}'
   FileStorage:
     Type: AWS::S3::Bucket
     Properties:
@@ -144,3 +147,4 @@ Resources:
                     Value: '.png'
       Layers:
         - 'Fn::Sub': '${OpenCVLayerARN}'
+        - 'Fn::Sub': '${SciPyLayerARN}'
