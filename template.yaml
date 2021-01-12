@@ -92,8 +92,8 @@ Resources:
             Path: '/resize_and_crop_image'
             Method: POST
       Layers:
-        - 'Fn::Sub': '${OpenCVLayerARN}'
         - 'Fn::Sub': '${SciPyLayerARN}'
+        - 'Fn::Sub': '${OpenCVLayerARN}'
   FileStorage:
     Type: AWS::S3::Bucket
     Properties:
@@ -146,5 +146,5 @@ Resources:
                   - Name: suffix
                     Value: '.png'
       Layers:
-        - 'Fn::Sub': '${OpenCVLayerARN}'
         - 'Fn::Sub': '${SciPyLayerARN}'
+        - 'Fn::Sub': '${OpenCVLayerARN}'
