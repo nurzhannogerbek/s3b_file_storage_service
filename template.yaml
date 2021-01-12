@@ -13,6 +13,8 @@ Parameters:
     Type: String
   FileStorageName:
     Type: String
+  OpenCVLayerARN:
+    Type: String
 Globals:
   Function:
     Runtime: python3.8
@@ -87,6 +89,8 @@ Resources:
               Ref: FileStorageApiGateway
             Path: '/resize_and_crop_image'
             Method: POST
+      Layers:
+        - 'Fn::Sub': '${OpenCVLayerARN}'
   FileStorage:
     Type: AWS::S3::Bucket
     Properties:
@@ -138,3 +142,5 @@ Resources:
                     Value: 'chat_rooms/'
                   - Name: suffix
                     Value: '.png'
+      Layers:
+        - 'Fn::Sub': '${OpenCVLayerARN}'

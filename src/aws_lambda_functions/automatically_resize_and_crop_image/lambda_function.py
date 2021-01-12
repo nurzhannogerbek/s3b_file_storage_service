@@ -1,6 +1,7 @@
 import logging
 import os
 import boto3
+import cv2
 
 # Configure the logging tool in the AWS Lambda function.
 logger = logging.getLogger(__name__)
