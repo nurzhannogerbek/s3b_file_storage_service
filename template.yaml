@@ -97,6 +97,12 @@ Resources:
   FileStorage:
     Type: AWS::S3::Bucket
     Properties:
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
       BucketName:
         'Fn::Sub': '${FileStorageName}'
   AutomaticallyResizeAndCropImage:
