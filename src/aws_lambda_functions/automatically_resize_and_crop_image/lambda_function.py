@@ -1,6 +1,7 @@
 import logging
 import os
 import boto3
+from io import BytesIO
 import cv2
 
 # Configure the logging tool in the AWS Lambda function.
@@ -35,11 +36,49 @@ def lambda_handler(event, context):
         # Define the value of the S3 bucket object key.
         try:
             original_s3_object_key = key["s3"]["object"]["key"]
-        except Exception as error:
+        except KeyError as error:
             logger.error(error)
             raise Exception(error)
 
-        print(original_s3_object_key)
+        # Grab the original source file.
+        original_s3_object = s3_client.Object(bucket_name=FILE_STORAGE_NAME, key=original_s3_object_key)
+        original_s3_object_body = original_s3_object.get()["Body"].read()
+
+        # Read the image file.
+        original_image = cv2.imread(BytesIO(original_s3_object_body))
+
+        # Define the original image file's size.
+        original_image_width, original_image_height = original_image.shape[1], original_image.shape[0]
+
+        for parameter in sizes:
+            # Create the unique S3 bucket object key for specific size.
+            original_s3_object_key_parts = original_s3_object_key.rsplit('/', 1)
+            new_s3_object_key = "{0}/{1}x{2}/{3}".format(
+                original_s3_object_key_parts[0],
+                parameter["width"],
+                parameter["height"],
+                original_s3_object_key_parts[1]
+            )
+
+            # Crop the original image file by center.
+            if parameter["width"] < original_image_width:
+                new_image_width = parameter["width"]
+            else:
+                new_image_width = original_image_width
+            if parameter["height"] < original_image_height:
+                new_image_height = parameter["height"]
+            else:
+                new_image_height = original_image_height
+            mid_x, mid_y = int(original_image_width / 2), int(original_image_height / 2)
+            cw2, ch2 = int(new_image_width / 2), int(new_image_height / 2)
+            new_image = original_image[mid_y - ch2:mid_y + ch2, mid_x - cw2:mid_x + cw2]
+            buffer = BytesIO()
+            new_image.save(buffer, format)
+            buffer.seek(0)
+
+            # Upload the new image file.
+            new_s3_object_body = s3_client.Object(bucket_name=FILE_STORAGE_NAME, key=new_s3_object_key)
+            new_s3_object_body.put(Body=buffer)
 
     # Return nothing.
     return None
