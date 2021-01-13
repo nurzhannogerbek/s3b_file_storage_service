@@ -65,7 +65,7 @@ def lambda_handler(event, context):
         original_s3_object_key_parts = original_s3_object_key.rsplit('/', 1)
         image_size = "{0}x{1}".format(parameter["width"], parameter["height"])
         new_s3_object_key = "{0}/{1}/{2}".format(
-            original_s3_object_key_parts[0].replace("users/", "users_cropped_images/"),
+            original_s3_object_key_parts[0].replace("users/", "users_resized_and_cropped_images/"),
             image_size,
             original_s3_object_key_parts[1]
         )
