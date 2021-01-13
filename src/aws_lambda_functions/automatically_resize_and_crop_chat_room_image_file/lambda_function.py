@@ -25,7 +25,7 @@ def lambda_handler(event, context):
     :param context: The AWS Lambda function uses this parameter to provide runtime information to your handler.
     """
     # All size parameters (width/height): 220x156, 88x88, 64x64, 40x40.
-    sizes = [
+    image_file_sizes = [
         {"width": 220, "height": 156},
         {"width": 88, "height": 88},
         {"width": 64, "height": 64},
@@ -34,52 +34,52 @@ def lambda_handler(event, context):
 
     # https://docs.aws.amazon.com/lambda/latest/dg/with-s3.html
     for key in event.get("Records"):
-        # Define the value of the S3 bucket object key.
+        # Define the value of the S3 bucket object's key.
         try:
             original_s3_object_key = unquote_plus(key["s3"]["object"]["key"])
         except KeyError as error:
             logger.error(error)
             raise Exception(error)
 
-        # Grab the original source file.
+        # Grab the original source file from the S3 bucket.
         original_s3_object = s3_resource.Object(bucket_name=FILE_STORAGE_NAME, key=original_s3_object_key)
         original_s3_object_body = original_s3_object.get()["Body"].read()
 
         # Read the image file.
-        original_image = cv2.imdecode(numpy.asarray(bytearray(original_s3_object_body)), cv2.IMREAD_COLOR)
+        original_image_file = cv2.imdecode(numpy.asarray(bytearray(original_s3_object_body)), cv2.IMREAD_COLOR)
 
-        # Define the size of the original image file.
-        original_image_width, original_image_height = original_image.shape[1], original_image.shape[0]
+        # Define the width and height of the the original image file.
+        original_image_file_width = original_image_file.shape[1]
+        original_image_file_height = original_image_file.shape[0]
 
         # Define the extension of the original image file.
         original_image_file_extension = os.path.splitext(original_s3_object_key)[1].lower()
 
-        for parameter in sizes:
-            # Create the unique S3 bucket object key for specific size.
+        for parameter in image_file_sizes:
+            # Create the unique S3 bucket object key for the new image file.
             original_s3_object_key_parts = original_s3_object_key.rsplit('/', 1)
-            image_size = "{0}x{1}".format(parameter["width"], parameter["height"])
             new_s3_object_key = "{0}/{1}/{2}".format(
-                original_s3_object_key_parts[0].replace("chat_rooms/", "chat_rooms_resized_and_cropped_images/"),
-                image_size,
+                original_s3_object_key_parts[0].replace("chat_rooms/", "chat_rooms_images/"),
+                "{0}x{1}".format(parameter["width"], parameter["height"]),
                 original_s3_object_key_parts[1]
             )
 
             # Crop the original image file by center.
-            if parameter["width"] < original_image_width:
+            if parameter["width"] < original_image_file_width:
                 new_image_width = parameter["width"]
             else:
-                new_image_width = original_image_width
-            if parameter["height"] < original_image_height:
+                new_image_width = original_image_file_width
+            if parameter["height"] < original_image_file_height:
                 new_image_height = parameter["height"]
             else:
-                new_image_height = original_image_height
-            x, y = int(original_image_width/2), int(original_image_height/2)
+                new_image_height = original_image_file_height
+            x, y = int(original_image_file_width/2), int(original_image_file_height/2)
             width, height = int(new_image_width/2), int(new_image_height/2)
-            new_image = original_image[y-height:y+height, x-width:x+width]
+            new_image_file = original_image_file[y-height:y+height, x-width:x+width]
 
-            # Upload the new image file.
+            # Upload the new image file to the S3 bucket.
             new_s3_object = s3_resource.Object(bucket_name=FILE_STORAGE_NAME, key=new_s3_object_key)
-            new_s3_object.put(Body=cv2.imencode(original_image_file_extension, new_image)[1].tobytes())
+            new_s3_object.put(Body=cv2.imencode(original_image_file_extension, new_image_file)[1].tobytes())
 
     # Return nothing.
     return None

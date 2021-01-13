@@ -76,12 +76,12 @@ Resources:
               Ref: FileStorageApiGateway
             Path: '/get_presigned_url_to_upload_file'
             Method: GET
-  ResizeAndCropImage:
+  ResizeAndCropImageFile:
     Type: 'AWS::Serverless::Function'
     Properties:
       FunctionName:
-        'Fn::Sub': '${EnvironmentName}ResizeAndCropImage'
-      CodeUri: src/aws_lambda_functions/resize_and_crop_image
+        'Fn::Sub': '${EnvironmentName}ResizeAndCropImageFile'
+      CodeUri: src/aws_lambda_functions/resize_and_crop_image_file
       Handler: lambda_function.lambda_handler
       Events:
         FileStorageApiGateway:
@@ -89,12 +89,12 @@ Resources:
           Properties:
             ApiId:
               Ref: FileStorageApiGateway
-            Path: '/resize_and_crop_image'
+            Path: '/resize_and_crop_image_file'
             Method: POST
       Layers:
         - 'Fn::Sub': '${OpenCVLayerARN}'
         - 'Fn::Sub': '${SciPyLayerARN}'
-  FileStorage:
+  FileStorageS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: Private
@@ -105,20 +105,20 @@ Resources:
         RestrictPublicBuckets: True
       BucketName:
         'Fn::Sub': '${FileStorageName}'
-  AutomaticallyResizeAndCropImage:
+  AutomaticallyResizeAndCropChatRoomImageFile:
     Type: 'AWS::Serverless::Function'
     Properties:
       FunctionName:
-        'Fn::Sub': '${EnvironmentName}AutomaticallyResizeAndCropImage'
+        'Fn::Sub': '${EnvironmentName}AutomaticallyResizeAndCropChatRoomImageFile'
       Policies:
         - AmazonS3FullAccess
-      CodeUri: src/aws_lambda_functions/automatically_resize_and_crop_image
+      CodeUri: src/aws_lambda_functions/automatically_resize_and_crop_chat_room_image_file
       Handler: lambda_function.lambda_handler
       Events:
         JPGFileCreatedInChatRoomsFolder:
           Type: S3
           Properties:
-            Bucket: !Ref FileStorage
+            Bucket: !Ref FileStorageS3Bucket
             Events: s3:ObjectCreated:*
             Filter:
               S3Key:
@@ -130,7 +130,7 @@ Resources:
         JPEGFileCreatedInChatRoomsFolder:
           Type: S3
           Properties:
-            Bucket: !Ref FileStorage
+            Bucket: !Ref FileStorageS3Bucket
             Events: s3:ObjectCreated:*
             Filter:
               S3Key:
@@ -142,7 +142,7 @@ Resources:
         PNGFileCreatedInChatRoomsFolder:
           Type: S3
           Properties:
-            Bucket: !Ref FileStorage
+            Bucket: !Ref FileStorageS3Bucket
             Events: s3:ObjectCreated:*
             Filter:
               S3Key:
