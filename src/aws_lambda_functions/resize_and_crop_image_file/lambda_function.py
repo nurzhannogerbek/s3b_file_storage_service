@@ -57,8 +57,17 @@ def lambda_handler(event, context):
         }
 
     # Grab the original source file from the S3 bucket.
-    original_s3_object = s3_resource.Object(bucket_name=FILE_STORAGE_NAME, key=original_s3_object_key)
-    original_s3_object_body = original_s3_object.get()["Body"].read()
+    try:
+        original_s3_object = s3_resource.Object(bucket_name=FILE_STORAGE_NAME, key=original_s3_object_key)
+        original_s3_object_body = original_s3_object.get()["Body"].read()
+    except Exception as error:
+        logger.error(error)
+        return {
+            "statusCode": 500,
+            "body": json.dumps({
+                "errorMessage": error
+            })
+        }
 
     # Read the image file.
     original_image_file = cv2.imdecode(numpy.asarray(bytearray(original_s3_object_body)), cv2.IMREAD_COLOR)
@@ -73,8 +82,8 @@ def lambda_handler(event, context):
         # Create the unique S3 bucket object key for the new image file.
         original_s3_object_key_parts = original_s3_object_key.split('/')
         original_s3_object_key_parts[0] = "{0}{1}".format(original_s3_object_key_parts[0], "_images")
-        original_s3_object_key = "/".join(original_s3_object_key_parts)
-        original_s3_object_key_parts = original_s3_object_key.rsplit('/', 1)
+        temporary_s3_object_key = "/".join(original_s3_object_key_parts)
+        original_s3_object_key_parts = temporary_s3_object_key.rsplit('/', 1)
         image_file_size = "{0}x{1}".format(parameter["width"], parameter["height"])
         new_s3_object_key = "{0}/{1}/{2}".format(
             original_s3_object_key_parts[0],

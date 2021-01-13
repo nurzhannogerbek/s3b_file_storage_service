@@ -42,8 +42,12 @@ def lambda_handler(event, context):
             raise Exception(error)
 
         # Grab the original source file from the S3 bucket.
-        original_s3_object = s3_resource.Object(bucket_name=FILE_STORAGE_NAME, key=original_s3_object_key)
-        original_s3_object_body = original_s3_object.get()["Body"].read()
+        try:
+            original_s3_object = s3_resource.Object(bucket_name=FILE_STORAGE_NAME, key=original_s3_object_key)
+            original_s3_object_body = original_s3_object.get()["Body"].read()
+        except Exception as error:
+            logger.error(error)
+            raise Exception(error)
 
         # Read the image file.
         original_image_file = cv2.imdecode(numpy.asarray(bytearray(original_s3_object_body)), cv2.IMREAD_COLOR)
