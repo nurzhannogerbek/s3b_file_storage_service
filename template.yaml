@@ -105,6 +105,15 @@ Resources:
         RestrictPublicBuckets: True
       BucketName:
         'Fn::Sub': '${FileStorageName}'
+      CorsConfiguration:
+        CorsRules:
+          AllowedHeaders:
+            - '*'
+          AllowedMethods:
+            - GET
+            - POST
+          AllowedOrigins:
+            - '*'
   AutomaticallyResizeAndCropChatRoomImageFile:
     Type: 'AWS::Serverless::Function'
     Properties:
