@@ -107,13 +107,9 @@ Resources:
         'Fn::Sub': '${FileStorageName}'
       CorsConfiguration:
         CorsRules:
-          - AllowedHeaders:
-              - '*'
-            AllowedMethods:
-              - GET
-              - POST
-            AllowedOrigins:
-              - '*'
+          - AllowedHeaders: ['*']
+            AllowedMethods: ['GET', 'POST']
+            AllowedOrigins: ['*']
   AutomaticallyResizeAndCropChatRoomImageFile:
     Type: 'AWS::Serverless::Function'
     Properties:
