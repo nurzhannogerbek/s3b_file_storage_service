@@ -92,15 +92,21 @@ def lambda_handler(event, context):
         )
 
         # Crop the original image file and then resize it.
-        cropped_image_file = original_image_file[
-                                coordinates["y"]:coordinates["height"],
-                                coordinates["x"]:coordinates["width"]
-                             ]
-        resized_image_file = cv2.resize(
-            cropped_image_file,
-            (parameter["width"], parameter["height"]),
-            interpolation=cv2.INTER_AREA
-        )
+        try:
+            x = coordinates["x"]
+            y = coordinates["y"]
+            width = coordinates["width"]
+            height = coordinates["height"]
+            cropped_image_file = original_image_file[y:height, x:width]
+            resized_image_file = cv2.resize(cropped_image_file, (parameter["width"], parameter["height"]))
+        except Exception as error:
+            logger.error(error)
+            return {
+                "statusCode": 500,
+                "body": json.dumps({
+                    "errorMessage": "The image file may be damaged."
+                })
+            }
 
         # Upload the new image file to the S3 bucket.
         new_s3_object = s3_resource.Object(bucket_name=FILE_STORAGE_NAME, key=new_s3_object_key)

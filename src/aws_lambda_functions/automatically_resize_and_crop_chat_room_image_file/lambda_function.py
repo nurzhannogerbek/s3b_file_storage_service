@@ -79,7 +79,11 @@ def lambda_handler(event, context):
                 new_image_height = original_image_file_height
             x, y = int(original_image_file_width/2), int(original_image_file_height/2)
             width, height = int(new_image_width/2), int(new_image_height/2)
-            new_image_file = original_image_file[y-height:y+height, x-width:x+width]
+            try:
+                new_image_file = original_image_file[y-height:y+height, x-width:x+width]
+            except Exception as error:
+                logger.error(error)
+                raise Exception(error)
 
             # Upload the new image file to the S3 bucket.
             new_s3_object = s3_resource.Object(bucket_name=FILE_STORAGE_NAME, key=new_s3_object_key)
