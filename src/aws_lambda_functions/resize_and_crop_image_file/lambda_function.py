@@ -91,12 +91,20 @@ def lambda_handler(event, context):
             original_s3_object_key_parts[1]
         )
 
-        # Crop the original image file.
-        new_image_file = original_image_file[coordinates["y"]:parameter["height"], coordinates["x"]:parameter["width"]]
+        # Crop the original image file and then resize it.
+        cropped_image_file = original_image_file[
+                                coordinates["y"]:coordinates["height"],
+                                coordinates["x"]:coordinates["width"]
+                             ]
+        resized_image_file = cv2.resize(
+            cropped_image_file,
+            (parameter["width"], parameter["height"]),
+            interpolation=cv2.INTER_AREA
+        )
 
         # Upload the new image file to the S3 bucket.
         new_s3_object = s3_resource.Object(bucket_name=FILE_STORAGE_NAME, key=new_s3_object_key)
-        new_s3_object.put(Body=cv2.imencode(original_image_file_extension, new_image_file)[1].tobytes())
+        new_s3_object.put(Body=cv2.imencode(original_image_file_extension, resized_image_file)[1].tobytes())
 
         # Add the url address of the new image file to the array.
         url = {
