@@ -108,12 +108,12 @@ Resources:
       CorsConfiguration:
         CorsRules:
           - AllowedHeaders:
-            - '*'
-          - AllowedMethods:
-            - GET
-            - POST
-          - AllowedOrigins:
-            - '*'
+              - '*'
+            AllowedMethods:
+              - GET
+              - POST
+            AllowedOrigins:
+              - '*'
   AutomaticallyResizeAndCropChatRoomImageFile:
     Type: 'AWS::Serverless::Function'
     Properties:
