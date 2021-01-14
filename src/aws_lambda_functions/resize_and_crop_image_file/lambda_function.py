@@ -104,7 +104,7 @@ def lambda_handler(event, context):
             return {
                 "statusCode": 500,
                 "body": json.dumps({
-                    "errorMessage": "Image file is damaged."
+                    "errorMessage": "The image file may be damaged."
                 })
             }
 
