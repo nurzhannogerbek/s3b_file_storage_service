@@ -46,6 +46,11 @@ def lambda_handler(event, context):
     except KeyError as error:
         logger.error(error)
         raise Exception(error)
+    try:
+        scale = body["scale"]
+    except KeyError as error:
+        logger.error(error)
+        raise Exception(error)
 
     # Check which folder the client is going to work with.
     if original_s3_object_key.startswith("chat_rooms/"):
@@ -98,7 +103,7 @@ def lambda_handler(event, context):
             width = coordinates["width"]
             height = coordinates["height"]
             cropped_image_file = original_image_file[y:height, x:width]
-            resized_image_file = cv2.resize(cropped_image_file, (parameter["width"], parameter["height"]))
+            resized_image_file = cv2.resize(cropped_image_file, (parameter["width"]*scale, parameter["height"]*scale))
         except Exception as error:
             logger.error(error)
             return {
