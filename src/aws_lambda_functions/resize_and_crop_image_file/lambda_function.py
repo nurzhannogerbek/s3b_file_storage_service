@@ -103,7 +103,10 @@ def lambda_handler(event, context):
             width = coordinates["width"]
             height = coordinates["height"]
             cropped_image_file = original_image_file[y:height, x:width]
-            resized_image_file = cv2.resize(cropped_image_file, (parameter["width"]*scale, parameter["height"]*scale))
+            resized_image_file = cv2.resize(
+                cropped_image_file,
+                (int(parameter["width"]*scale), int(parameter["height"]*scale))
+            )
         except Exception as error:
             logger.error(error)
             return {
