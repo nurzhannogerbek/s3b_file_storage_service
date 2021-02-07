@@ -100,7 +100,8 @@ def lambda_handler(event, context):
             raise Exception(error)
 
         # Read the image file.
-        image_file = cv2.imdecode(numpy.asarray(bytearray(s3_object_body)))
+        image_file = numpy.asarray(bytearray(s3_object_body), dtype="uint8")
+        image_file = cv2.imdecode(image_file, cv2.IMREAD_COLOR)
 
         # Define the width and height of the the original image file.
         image_file_height, image_file_width = image_file.shape[:2]
