@@ -110,14 +110,14 @@ Resources:
           - AllowedHeaders: ['*']
             AllowedMethods: ['GET', 'POST']
             AllowedOrigins: ['*']
-  AutomaticallyResizeAndCropChatRoomImageFile:
+  AutomaticallyResizeChatRoomImageFile:
     Type: 'AWS::Serverless::Function'
     Properties:
       FunctionName:
-        'Fn::Sub': '${EnvironmentName}AutomaticallyResizeAndCropChatRoomImageFile'
+        'Fn::Sub': '${EnvironmentName}AutomaticallyResizeChatRoomImageFile'
       Policies:
         - AmazonS3FullAccess
-      CodeUri: src/aws_lambda_functions/automatically_resize_and_crop_chat_room_image_file
+      CodeUri: src/aws_lambda_functions/automatically_resize_chat_room_image_file
       Handler: lambda_function.lambda_handler
       Events:
         JPGFileCreatedInChatRoomsFolder:
