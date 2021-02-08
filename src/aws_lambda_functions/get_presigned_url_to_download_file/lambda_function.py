@@ -25,7 +25,12 @@ def lambda_handler(event, context):
     """
     # Define all necessary parameters to generate the presigned URL.
     try:
-        s3_key = unquote_plus(event["queryStringParameters"]["s3_key"])
+        query_string_parameters = event["queryStringParameters"]
+    except KeyError as error:
+        logger.error(error)
+        raise Exception(error)
+    try:
+        key = unquote_plus(query_string_parameters["key"])
     except Exception as error:
         logger.error(error)
         raise Exception(error)
@@ -36,7 +41,7 @@ def lambda_handler(event, context):
             "get_object",
             Params={
                 "Bucket": FILE_STORAGE_NAME,
-                "Key": s3_key
+                "Key": key
             },
             ExpiresIn=60
         )
