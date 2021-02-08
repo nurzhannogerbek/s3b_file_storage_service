@@ -75,7 +75,7 @@ def lambda_handler(event, context):
         width = int(query_string_parameters["width"])
         height = int(query_string_parameters["height"])
         quality = int(query_string_parameters["quality"])
-        upscale = True if query_string_parameters.get["upscale"].lower() == 'true' else False
+        upscale = True if query_string_parameters["upscale"].lower() == 'true' else False
     except Exception as error:
         logger.error(error)
         raise Exception(error)
