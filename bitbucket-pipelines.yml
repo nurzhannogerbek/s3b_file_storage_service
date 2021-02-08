@@ -11,7 +11,6 @@ deploy:
             export STAGE_NAME='dev'
             export ENVIRONMENT_NAME='Dev'
             export PILLOW_LAYER_NAME='DevPillow'
-            export OPENCV_LAYER_NAME='DevOpenCV'
           fi
         - |
           if [ $BITBUCKET_BRANCH == 'master' ]; then
@@ -21,7 +20,6 @@ deploy:
             export STAGE_NAME='prod'
             export ENVIRONMENT_NAME='Prod'
             export PILLOW_LAYER_NAME='ProdPillow'
-            export OPENCV_LAYER_NAME='ProdOpenCV'
           fi
         - apt-get update && apt-get install -y python3-pip
         - pip3 install -U awscli
@@ -33,11 +31,6 @@ deploy:
           export PILLOW_LAYER_ARN=$(aws lambda list-layer-versions
           --layer-name $PILLOW_LAYER_NAME --query 'max_by(LayerVersions,
           &Version).LayerVersionArn'  --output text)
-        - >-
-          export OPENCV_LAYER_ARN=$(aws lambda list-layer-versions
-          --layer-name $OPENCV_LAYER_NAME --query 'max_by(LayerVersions,
-          &Version).LayerVersionArn' --output text)
-        - export SCIPY_LAYER_ARN='arn:aws:lambda:eu-central-1:292169987271:layer:AWSLambda-Python38-SciPy1x:29'
         - pipe: 'atlassian/aws-sam-deploy:0.5.2'
           variables:
             AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
@@ -79,14 +72,6 @@ deploy:
                 {
                   'ParameterKey': 'PillowLayerARN',
                   'ParameterValue': '${PILLOW_LAYER_ARN}'
-                },
-                {
-                  'ParameterKey': 'OpenCVLayerARN',
-                  'ParameterValue': '${OPENCV_LAYER_ARN}'
-                },
-                {
-                  'ParameterKey': 'SciPyLayerARN',
-                  'ParameterValue': '${SCIPY_LAYER_ARN}'
                 }
               ]
             WAIT: 'true'

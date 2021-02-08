@@ -26,30 +26,31 @@ def resize_image_file(**kwargs):
         image_file = kwargs["image_file"]
         image_file_width = kwargs["image_file_width"]
         image_file_height = kwargs["image_file_height"]
-        new_image_file_width = kwargs["new_image_file_width"]
-        new_image_file_height = kwargs["new_image_file_height"]
+        width = kwargs["width"]
+        height = kwargs["height"]
+        upscale = kwargs["upscale"]
     except KeyError as error:
         logger.error(error)
         raise Exception(error)
 
     # Check the dimensions.
-    if image_file_width <= new_image_file_width and image_file_height <= new_image_file_height:
+    if image_file_width <= width and image_file_height <= height and not upscale:
         dimension = (image_file_width, image_file_height)
     else:
-        if new_image_file_width > 90 and new_image_file_height > 90:
+        if width > 90 and height > 90:
             if image_file_width > image_file_height:
-                ratio = new_image_file_width / float(image_file_width)
-                dimension = (new_image_file_width, int(image_file_height * ratio))
+                ratio = width / float(image_file_width)
+                dimension = (width, int(image_file_height * ratio))
             else:
-                ratio = new_image_file_height / float(image_file_height)
-                dimension = (int(image_file_width * ratio), new_image_file_height)
+                ratio = height / float(image_file_height)
+                dimension = (int(image_file_width * ratio), height)
         else:
             if image_file_width < image_file_height:
-                ratio = new_image_file_width / float(image_file_width)
-                dimension = (new_image_file_width, int(image_file_height * ratio))
+                ratio = width / float(image_file_width)
+                dimension = (width, int(image_file_height * ratio))
             else:
-                ratio = new_image_file_height / float(image_file_height)
-                dimension = (int(image_file_width * ratio), new_image_file_height)
+                ratio = height / float(image_file_height)
+                dimension = (int(image_file_width * ratio), height)
 
     # Resize the original image file.
     try:
@@ -70,16 +71,18 @@ def lambda_handler(event, context):
     # Define all necessary parameters to generate the presigned URL.
     try:
         query_string_parameters = event["queryStringParameters"]
-        s3_object_key = unquote_plus(query_string_parameters["s3_key"])
-        new_image_file_width = int(query_string_parameters["max_width"])
-        new_image_file_height = int(query_string_parameters["max_height"])
+        key = unquote_plus(query_string_parameters["key"])
+        width = query_string_parameters["width"]
+        height = query_string_parameters["height"]
+        quality = query_string_parameters.get("quality", 75)
+        upscale = query_string_parameters.get("upscale", False)
     except Exception as error:
         logger.error(error)
         raise Exception(error)
 
     # Grab the original source file from the S3 bucket.
     try:
-        s3_object = s3_resource.Object(bucket_name=FILE_STORAGE_NAME, key=s3_object_key)
+        s3_object = s3_resource.Object(bucket_name=FILE_STORAGE_NAME, key=key)
         s3_object_body = s3_object.get()["Body"].read()
     except Exception as error:
         logger.error(error)
@@ -87,6 +90,12 @@ def lambda_handler(event, context):
 
     # Read the original image file.
     image_file = Image.open(BytesIO(s3_object_body))
+
+    # Define the MIME type of the original image file.
+    image_file_mimetype = image_file.get_format_mimetype()
+
+    # Define the format of the original image file.
+    image_file_format = image_file.format
 
     # Define the width and height of the the original image file.
     image_file_width, image_file_height = image_file.size
@@ -96,12 +105,22 @@ def lambda_handler(event, context):
         image_file=image_file,
         image_file_width=image_file_width,
         image_file_height=image_file_height,
-        new_image_file_width=new_image_file_width,
-        new_image_file_height=new_image_file_height
+        width=width,
+        height=height,
+        upscale=upscale
     )
+
+    # Convert PIL Image to Base64 string.
+    buffer = BytesIO()
+    resized_image_file.save(buffer, format=image_file_format, optimize=True, quality=quality)
+    binary_image_file = buffer.getvalue()
 
     # Return the resized image as Base64 string.
     return {
         "statusCode": 200,
-        "body": base64.b64encode(resized_image_file.read())
+        "body": base64.b64encode(binary_image_file),
+        "isBase64Encoded": True,
+        "headers": {
+            'Content-Type': image_file_mimetype
+        }
     }

@@ -30,7 +30,7 @@ def lambda_handler(event, context):
         logger.error(error)
         raise Exception(error)
     try:
-        s3_key = unquote_plus(query_string_parameters["s3_key"])
+        key = unquote_plus(query_string_parameters["key"])
     except Exception as error:
         logger.error(error)
         raise Exception(error)
@@ -39,7 +39,7 @@ def lambda_handler(event, context):
     try:
         presigned_url = s3_client.generate_presigned_post(
             Bucket=FILE_STORAGE_NAME,
-            Key=s3_key,
+            Key=key,
             Fields=None,
             Conditions=None,
             ExpiresIn=60
