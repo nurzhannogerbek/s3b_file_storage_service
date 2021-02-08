@@ -10,6 +10,7 @@ deploy:
             export STACK_NAME='Dev3beepFileStorageService'
             export STAGE_NAME='dev'
             export ENVIRONMENT_NAME='Dev'
+            export PILLOW_LAYER_NAME='DevPillow'
             export OPENCV_LAYER_NAME='DevOpenCV'
           fi
         - |
@@ -19,6 +20,7 @@ deploy:
             export STACK_NAME='Prod3beepFileStorageService'
             export STAGE_NAME='prod'
             export ENVIRONMENT_NAME='Prod'
+            export PILLOW_LAYER_NAME='ProdPillow'
             export OPENCV_LAYER_NAME='ProdOpenCV'
           fi
         - apt-get update && apt-get install -y python3-pip
@@ -27,6 +29,10 @@ deploy:
         - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
         - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
         - aws s3 rm --recursive s3://$S3_BUCKET
+        - >-
+          export PILLOW_LAYER_ARN=$(aws lambda list-layer-versions
+          --layer-name $PILLOW_LAYER_NAME --query 'max_by(LayerVersions,
+          &Version).LayerVersionArn'  --output text)
         - >-
           export OPENCV_LAYER_ARN=$(aws lambda list-layer-versions
           --layer-name $OPENCV_LAYER_NAME --query 'max_by(LayerVersions,
@@ -69,6 +75,10 @@ deploy:
                 {
                   'ParameterKey': 'FileStorageName',
                   'ParameterValue': '${FILE_STORAGE_NAME}'
+                },
+                {
+                  'ParameterKey': 'PillowLayerARN',
+                  'ParameterValue': '${PILLOW_LAYER_ARN}'
                 },
                 {
                   'ParameterKey': 'OpenCVLayerARN',

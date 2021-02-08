@@ -13,6 +13,8 @@ Parameters:
     Type: String
   FileStorageName:
     Type: String
+  PillowLayerARN:
+    Type: String
   OpenCVLayerARN:
     Type: String
   SciPyLayerARN:
@@ -110,52 +112,20 @@ Resources:
           - AllowedHeaders: ['*']
             AllowedMethods: ['GET', 'POST']
             AllowedOrigins: ['*']
-  AutomaticallyResizeChatRoomImageFile:
+  DownloadResizedImageFile:
     Type: 'AWS::Serverless::Function'
     Properties:
       FunctionName:
-        'Fn::Sub': '${EnvironmentName}AutomaticallyResizeChatRoomImageFile'
-      Policies:
-        - AmazonS3FullAccess
-      CodeUri: src/aws_lambda_functions/automatically_resize_chat_room_image_file
+        'Fn::Sub': '${EnvironmentName}DownloadResizedImageFile'
+      CodeUri: src/aws_lambda_functions/download_resized_image_file
       Handler: lambda_function.lambda_handler
       Events:
-        JPGFileCreatedInChatRoomsFolder:
-          Type: S3
+        FileStorageApiGateway:
+          Type: HttpApi
           Properties:
-            Bucket: !Ref FileStorageS3Bucket
-            Events: s3:ObjectCreated:*
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: 'chat_rooms/'
-                  - Name: suffix
-                    Value: '.jpg'
-        JPEGFileCreatedInChatRoomsFolder:
-          Type: S3
-          Properties:
-            Bucket: !Ref FileStorageS3Bucket
-            Events: s3:ObjectCreated:*
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: 'chat_rooms/'
-                  - Name: suffix
-                    Value: '.jpeg'
-        PNGFileCreatedInChatRoomsFolder:
-          Type: S3
-          Properties:
-            Bucket: !Ref FileStorageS3Bucket
-            Events: s3:ObjectCreated:*
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: 'chat_rooms/'
-                  - Name: suffix
-                    Value: '.png'
+            ApiId:
+              Ref: FileStorageApiGateway
+            Path: '/download_resized_image_file'
+            Method: GET
       Layers:
-        - 'Fn::Sub': '${OpenCVLayerARN}'
-        - 'Fn::Sub': '${SciPyLayerARN}'
+        - 'Fn::Sub': '${PillowLayerARN}'
