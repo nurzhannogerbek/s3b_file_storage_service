@@ -72,10 +72,10 @@ def lambda_handler(event, context):
     try:
         query_string_parameters = event["queryStringParameters"]
         key = unquote_plus(query_string_parameters["key"])
-        width = query_string_parameters["width"]
-        height = query_string_parameters["height"]
-        quality = query_string_parameters.get("quality", 75)
-        upscale = query_string_parameters.get("upscale", False)
+        width = int(query_string_parameters["width"])
+        height = int(query_string_parameters["height"])
+        quality = int(query_string_parameters["quality"])
+        upscale = bool(query_string_parameters.get["upscale"])
     except Exception as error:
         logger.error(error)
         raise Exception(error)
