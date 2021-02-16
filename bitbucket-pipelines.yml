@@ -2,31 +2,13 @@ image:
   name: 'python:3.8'
 deploy:
   - step: &deploy
+      caches:
+        - pip
       script:
-        - |
-          if [ $BITBUCKET_BRANCH == 'develop' ]; then
-            export S3_BUCKET='dev-3beep-file-storage-service'
-            export FILE_STORAGE_NAME='dev-3beep-file-storage'
-            export STACK_NAME='Dev3beepFileStorageService'
-            export STAGE_NAME='dev'
-            export ENVIRONMENT_NAME='Dev'
-            export PILLOW_LAYER_NAME='DevPillow'
-          fi
-        - |
-          if [ $BITBUCKET_BRANCH == 'master' ]; then
-            export S3_BUCKET='prod-3beep-file-storage-service'
-            export FILE_STORAGE_NAME='prod-3beep-file-storage'
-            export STACK_NAME='Prod3beepFileStorageService'
-            export STAGE_NAME='prod'
-            export ENVIRONMENT_NAME='Prod'
-            export PILLOW_LAYER_NAME='ProdPillow'
-          fi
-        - apt-get update && apt-get install -y python3-pip
-        - pip3 install -U awscli
+        - pip install -U awscli==1.19.8
         - aws configure set default.region $AWS_DEFAULT_REGION
         - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
         - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-        - aws s3 rm --recursive s3://$S3_BUCKET
         - >-
           export PILLOW_LAYER_ARN=$(aws lambda list-layer-versions
           --layer-name $PILLOW_LAYER_NAME --query 'max_by(LayerVersions,
@@ -80,6 +62,10 @@ deploy:
 pipelines:
   branches:
     develop:
-      - step: *deploy
+      - step:
+          <<: *deploy
+          deployment: develop
     master:
-      - step: *deploy
+      - step:
+          <<: *deploy
+          deployment: master
